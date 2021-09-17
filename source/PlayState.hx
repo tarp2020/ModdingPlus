@@ -774,6 +774,7 @@ class PlayState extends MusicBeatState
 				{
 					var data:Array<String> = characters[i].split(' ');
 					dad = new Character (0, 0, data[0]);
+					trace ('found ' + data[0]);
 				}
 			}
 		if (FileSystem.exists(Paths.txt(songLowercase  + "/preload")))
@@ -784,6 +785,7 @@ class PlayState extends MusicBeatState
 					{
 						var data:Array<String> = characters[i].split(' ');
 						boyfriend = new Character (0, 0, data[0]);
+						trace ('found ' + data[0]);
 					}
 				}
 		#end
