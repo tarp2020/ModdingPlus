@@ -94,6 +94,7 @@ class PlayState extends MusicBeatState
 {
 	public static var customPrecence = FNFAssets.getText("assets/discord/presence/play.txt");
 	public static var curStage:String = '';
+	public static var bfAltAnim:String = "";
 	public static var SONG:SwagSong;
 	public static var isStoryMode:Bool = false;
 	public static var storyWeek:Int = 0;
