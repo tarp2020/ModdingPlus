@@ -2752,57 +2752,13 @@ class PlayState extends MusicBeatState
 					}*/
 				
 				
-				if (!daNote.mustPress && daNote.wasGoodHit && ((!duoMode && !opponentPlayer) || demoMode))
-				{
-					camZooming = true;
-					boyfriend.altAnim = "";
-					boyfriend.altNum = 0;
-					if (daNote.altNote)
+				if (SONG.notes[Math.floor(curStep / 16)] != null)
 					{
-						boyfriend.altAnim = '-alt';
-						boyfriend.altNum = 1;
-					}
-					boyfriend.altNum = daNote.altNum;
-					if (SONG.notes[Math.floor(curStep / 16)] != null)
-					{
-						if ((SONG.notes[Math.floor(curStep / 16)].altAnimNum > 0 && SONG.notes[Math.floor(curStep / 16)].altAnimNum != null) || SONG.notes[Math.floor(curStep / 16)].altAnim)
-							// backwards compatibility shit
-							if (SONG.notes[Math.floor(curStep / 16)].altAnimNum == 1 || SONG.notes[Math.floor(curStep / 16)].altAnim || daNote.altNote)
-								boyfriend.altNum = 1;
-							else if (SONG.notes[Math.floor(curStep / 16)].altAnimNum != 0)
-								boyfriend.altNum = SONG.notes[Math.floor(curStep / 16)].altAnimNum;
-					}
-					
-					if (boyfriend.altNum == 1) {
-						boyfriend.altAnim = '-alt';
-					} else if (boyfriend.altNum > 1) {
-						boyfriend.altAnim = '-' + boyfriend.altNum + 'alt';
-					}
-					callAllHScript("playerTwoSing", []);
-					// go wild <3
-					if (daNote.shouldBeSung) {
-						boyfriend.sing(Std.int(Math.abs(daNote.noteData)), false, boyfriend.altNum);
-						enemyStrums.forEach(function(spr:FlxSprite)
+						if (SONG.notes[Math.floor(curStep / 16)].bfAltAnim)
 						{
-							if (Math.abs(daNote.noteData) == spr.ID)
-							{
-								spr.animation.play('confirm');
-								sustain2(spr.ID, spr, daNote);
-							}
-						});
-						if (daNote.oppntSing != null) {
-							boyfriend.sing(daNote.oppntSing.direction, daNote.oppntSing.miss, daNote.oppntSing.alt);
+							boyfriend.bfAltAnim = '-alt';	
 						}
-					}
-					dad.holdTimer = 0;
-
-					if (SONG.needsVoices)
-						vocals.volume = 1;
-
-					daNote.kill();
-					notes.remove(daNote, true);
-					daNote.destroy();
-				}
+					}	
 				if (!daNote.mustPress && daNote.wasGoodHit && ((!duoMode && !opponentPlayer) || demoMode))
 				{
 					camZooming = true;
