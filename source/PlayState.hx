@@ -94,7 +94,6 @@ class PlayState extends MusicBeatState
 {
 	public static var customPrecence = FNFAssets.getText("assets/discord/presence/play.txt");
 	public static var curStage:String = '';
-	public static var bfAltAnim:String = "";
 	public static var SONG:SwagSong;
 	public static var isStoryMode:Bool = false;
 	public static var storyWeek:Int = 0;
@@ -109,6 +108,14 @@ class PlayState extends MusicBeatState
 	public var dad:Character;
 	public var gf:Character;
 	public var boyfriend:Character;
+	
+	public var boyfriendMap:Map<String, Boyfriend> = new Map();
+	public var dadMap:Map<String, Character> = new Map();
+	public var gfMap:Map<String, Character> = new Map();
+	
+	public var boyfriendMap:Map<String, Boyfriend> = new Map<String, Boyfriend>();
+	public var dadMap:Map<String, Character> = new Map<String, Character>();
+	public var gfMap:Map<String, Character> = new Map<String, Character>();
 
 	public var notes:FlxTypedGroup<Note>;
 	private var unspawnNotes:Array<Note> = [];
@@ -337,6 +344,7 @@ class PlayState extends MusicBeatState
 		interp.variables.set("BEHIND_ALL", BEHIND_ALL);
 		interp.variables.set("BEHIND_NONE", 0);
 		interp.variables.set("switchCharacter", switchCharacter);
+		interp.variables.set("change", change);
 		interp.variables.set("difficulty", storyDifficulty);
 		interp.variables.set("bpm", Conductor.bpm);
 		interp.variables.set("songData", SONG);
@@ -507,6 +515,56 @@ class PlayState extends MusicBeatState
 		callHscript("start", [SONG.song], usehaxe);
 		trace('executed');
 		
+	}
+	
+	function change(value1:String, value2:String) {
+		var charType:Int = Std.parseInt(value1);
+		if(Math.isNaN(charType)) charType = 0;
+			switch(charType) {
+					case 0:
+						if(boyfriend.curCharacter != value2) {
+							if(!boyfriendMap.exists(value2)) {
+								addCharacterToList(value2, charType);
+							}
+
+							boyfriend.visible = false;
+							boyfriend = boyfriendMap.get(value2);
+							boyfriend.visible = true;
+							iconP1.changeIcon(boyfriend.healthIcon);
+						}
+
+					case 1:
+						if(dad.curCharacter != value2) {
+							if(!dadMap.exists(value2)) {
+								addCharacterToList(value2, charType);
+							}
+
+							var wasGf:Bool = dad.curCharacter.startsWith('gf');
+							dad.visible = false;
+							dad = dadMap.get(value2);
+							if(!dad.curCharacter.startsWith('gf')) {
+								if(wasGf) {
+									gf.visible = true;
+								}
+							} else {
+								gf.visible = false;
+							}
+							dad.visible = true;
+							iconP2.changeIcon(dad.healthIcon);
+						}
+
+					case 2:
+						if(gf.curCharacter != value2) {
+							if(!gfMap.exists(value2)) {
+								addCharacterToList(value2, charType);
+							}
+
+							var isGfVisible:Bool = gf.visible;
+							gf.visible = false;
+							gf = gfMap.get(value2);
+							gf.visible = isGfVisible;
+						}
+				}
 	}
 	function instanceExClass(classname:String, args:Array<Dynamic> = null) {
 		return exInterp.createScriptClassInstance(classname, args);
@@ -2105,7 +2163,39 @@ class PlayState extends MusicBeatState
 
 		super.closeSubState();
 	}
+	
+	function addCharacterToList(newCharacter:String, type:Int) {
+		switch(type) {
+			case 0:
+				if(!boyfriendMap.exists(newCharacter)) {
+					var newBoyfriend:Boyfriend = new Boyfriend(BF_X, BF_Y, newCharacter);
+					boyfriendMap.set(newCharacter, newBoyfriend);
+					boyfriendGroup.add(newBoyfriend);
+					startCharacterPos(newBoyfriend);
+					newBoyfriend.visible = false;
+				}
 
+			case 1:
+				if(!dadMap.exists(newCharacter)) {
+					var newDad:Character = new Character(DAD_X, DAD_Y, newCharacter);
+					dadMap.set(newCharacter, newDad);
+					dadGroup.add(newDad);
+					startCharacterPos(newDad);
+					newDad.visible = false;
+				}
+
+			case 2:
+				if(!gfMap.exists(newCharacter)) {
+					var newGf:Character = new Character(GF_X, GF_Y, newCharacter);
+					newGf.scrollFactor.set(0.95, 0.95);
+					gfMap.set(newCharacter, newGf);
+					gfGroup.add(newGf);
+					startCharacterPos(newGf);
+					newGf.visible = false;
+				}
+		}
+	}
+	
 	function resyncVocals():Void
 	{
 		vocals.pause();
@@ -2753,13 +2843,7 @@ class PlayState extends MusicBeatState
 					}*/
 				
 				
-				if (SONG.notes[Math.floor(curStep / 16)] != null)
-					{
-						if (SONG.notes[Math.floor(curStep / 16)].bfAltAnim)
-						{
-							boyfriend.bfAltAnim = '-alt';	
-						}
-					}	
+				
 				if (!daNote.mustPress && daNote.wasGoodHit && ((!duoMode && !opponentPlayer) || demoMode))
 				{
 					camZooming = true;
